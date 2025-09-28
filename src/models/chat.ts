@@ -1,11 +1,12 @@
 import { Schema, model, Document } from 'mongoose';
 
-export interface IChatMessage extends Document {
+export interface IChatMessage {
   text: string;
   isUser: boolean;
   timestamp: Date;
-  imageUrl?: string;
   modelUsed: string;
+  imageUrl?: string;   // optional single image
+  images?: string[];   // optional multiple images
 }
 
 export interface IConversation extends Document {
