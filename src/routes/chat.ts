@@ -177,4 +177,38 @@ router.post(
   }
 );
 
+// Add to src/routes/chat.ts
+router.patch('/conversation/:id', async (req, res) => {
+  try {
+    const { title } = req.body;
+    const conversation = await Conversation.findByIdAndUpdate(
+      req.params.id,
+      { title },
+      { new: true }
+    );
+    res.json({ success: true, conversation });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err instanceof Error ? err.message : err, });
+  }
+});
+
+/**
+ * Delete a conversation
+ */
+router.delete('/conversation/:id', async (req, res) => {
+  try {
+    const conversation = await Conversation.findByIdAndDelete(req.params.id);
+    if (!conversation) {
+      return res.status(404).json({ success: false, error: 'Conversation not found' });
+    }
+    res.json({ success: true, message: 'Conversation deleted' });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ success: false, error: err.message });
+    } else {
+      res.status(500).json({ success: false, error: 'Unknown error' });
+    }
+  }
+});
+
 export default router;
