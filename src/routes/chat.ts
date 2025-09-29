@@ -12,6 +12,19 @@ import { readFile } from 'fs/promises';
 const router = Router();
 
 /**
+ * Clean AI response by removing citation markers like [1][2][3]
+ */
+function cleanAIResponse(text: string): string {
+  // Remove citation markers like [1][2][3]
+  let cleaned = text.replace(/\[\d+\]/g, '');
+  
+  // Remove multiple spaces caused by citation removal
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  
+  return cleaned;
+}
+
+/**
  * Create a new conversation
  */
 router.post('/conversation', async (req, res) => {
@@ -85,23 +98,23 @@ router.post(
       // If user uploaded an image, convert it to base64
       let imageDataUri: string | undefined;
       if (req.file) {
-  const filePath = req.file.path;
+        const filePath = req.file.path;
 
-  // Check if the file path is a URL (starts with http/https)
-  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-    // Use URL directly
-    imageDataUri = filePath;
-  } else {
-    // Local file, convert to base64
-    const resolvedPath = path.resolve(filePath);
-    const fileBuffer = await readFile(resolvedPath);
-    const mimeType = req.file.mimetype; // e.g., 'image/png'
+        // Check if the file path is a URL (starts with http/https)
+        if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+          // Use URL directly
+          imageDataUri = filePath;
+        } else {
+          // Local file, convert to base64
+          const resolvedPath = path.resolve(filePath);
+          const fileBuffer = await readFile(resolvedPath);
+          const mimeType = req.file.mimetype; // e.g., 'image/png'
 
-    imageDataUri = `data:${mimeType};base64,${fileBuffer.toString('base64')}`;
-  }
+          imageDataUri = `data:${mimeType};base64,${fileBuffer.toString('base64')}`;
+        }
 
-  userMessage.imageUrl = imageDataUri;
-}
+        userMessage.imageUrl = imageDataUri;
+      }
 
       conversation.messages.push(userMessage as IChatMessage);
 
@@ -146,8 +159,11 @@ router.post(
           aiText = String(aiResponse);
         }
 
+        // CLEAN THE AI TEXT BEFORE SAVING - ADDED THIS
+        aiText = cleanAIResponse(aiText.trim());
+
         aiMessage = {
-          text: aiText.trim(),
+          text: aiText, // Now using cleaned text
           images: aiImages,
           isUser: false,
           timestamp: new Date(),
