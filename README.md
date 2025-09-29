@@ -1,7 +1,7 @@
 # Perplexity API Backend Documentation
 
 ## Project Overview
-This is a Node.js/Express TypeScript backend that powers a multi-modal chat application with AI capabilities, designed to connect with a Flutter frontend.
+This is a Node.js/Express TypeScript backend that powers a multi-modal chat application powered by Perplexity AI API.
 
 ## Tech Stack
 
